@@ -51,11 +51,11 @@ const windDirections = [
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "weather-card",
-  name: "Weather Card",
+  type: "weather-card-denselm",
+  name: "Weather Card Densel",
   description: "A custom weather card with animated icons.",
   preview: true,
-  documentationURL: "https://github.com/bramkragten/weather-card",
+  documentationURL: "https://github.com/denselm/weather-card",
 });
 
 const fireEvent = (node, type, detail, options) => {
@@ -177,7 +177,7 @@ class WeatherCard extends LitElement {
         <span class="temp"
           >${this.getUnit("temperature") == "°F"
             ? Math.round(stateObj.attributes.temperature)
-            : stateObj.attributes.temperature}</span
+            : Math.round((stateObj.attributes.temperature - 32) * 5/9)}</span
         >
         <span class="tempc"> ${this.getUnit("temperature")}</span>
       </div>
@@ -218,7 +218,7 @@ class WeatherCard extends LitElement {
         </li>
         <li>
           <ha-icon icon="mdi:gauge"></ha-icon>
-          ${stateObj.attributes.pressure}
+          ${Math.round(stateObj.attributes.pressure*100)/100}
           <span class="unit">
             ${this.getUnit("air_pressure")}
           </span>
@@ -284,12 +284,12 @@ class WeatherCard extends LitElement {
                   )}') no-repeat; background-size: contain"
                 ></i>
                 <div class="highTemp">
-                  ${daily.temperature}${this.getUnit("temperature")}
+                  ${Math.round((daily.temperature - 32)*5/9)}${this.getUnit("temperature")}
                 </div>
                 ${daily.templow !== undefined
                   ? html`
                       <div class="lowTemp">
-                        ${daily.templow}${this.getUnit("temperature")}
+                        ${Math.round((daily.templow - 32)*5/9)}${this.getUnit("temperature")}
                       </div>
                     `
                   : ""}
@@ -341,6 +341,8 @@ class WeatherCard extends LitElement {
         return lengthUnit === "km" ? "mm" : "in";
       case "precipitation_probability":
         return "%";
+      case "temperature":
+        return "°C"
       default:
         return this.hass.config.unit_system[measure] || "";
     }
